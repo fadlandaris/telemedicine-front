@@ -130,7 +130,7 @@ function getEstimatedTimeText(
   const sec = remainingSec % 60;
 
   if (sec === 0) return `Estimated ${min} minutes`;
-  return `Estimated ${min} minutes ${sec}`;
+  return `Estimated ${min} minutes ${sec} seconds`;
 }
 
 type TaskCardProps = {
@@ -182,7 +182,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
         <div
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-medium ${avatarTone}`}
         >
-          {getInitials(task.patientName)}
+          {getInitials(task.patientName || task.patientIdentity)}
         </div>
       </div>
 
