@@ -2,6 +2,8 @@
 
 import IndonesiaMap from "./IndonesiaMap";
 import Image from "next/image";
+import DataEmpty from "@/components/reusable/DataEmpty";
+import { CircleNotchIcon, EmptyIcon, XIcon } from "@phosphor-icons/react";
 
 type CityStat = {
   city: string;
@@ -19,6 +21,7 @@ type DemographicCardProps = {
   markers?: MapMarker[];
   total?: number;
   loading?: boolean;
+  error?: boolean;
 };
 
 export default function DemographicCard({
@@ -26,7 +29,29 @@ export default function DemographicCard({
   markers = [],
   total = 0,
   loading = false,
+  error = false,
 }: DemographicCardProps) {
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+                Patients Location
+              </h3>
+            </div>
+            <p className="text-gray-500 text-theme-sm dark:text-gray-400">
+              City base distribution consultations
+            </p>
+          </div>
+        </div>
+        <div className="mt-6">
+          <DataEmpty ItemIcon={XIcon} value="Failed to load" subValue="Locations" />
+        </div>
+      </div>
+    );
+  }
   const safeCities = Array.isArray(cities) ? cities : [];
   const topCities = safeCities.slice(0, 6);
   const safeMarkers = Array.isArray(markers) ? markers : [];
@@ -74,12 +99,12 @@ export default function DemographicCard({
 
       <div className="mt-6 space-y-4">
         {loading ? (
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            Loading demographic...
+          <div className="">
+            <DataEmpty ItemIcon={CircleNotchIcon} value="Loading" subValue="Consultations" />
           </div>
         ) : topCities.length === 0 ? (
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            Belum ada data lokasi.
+          <div className="">
+            <DataEmpty ItemIcon={EmptyIcon} value="Data Empty" subValue="Starts consultations" />
           </div>
         ) : (
           topCities.map((item) => (

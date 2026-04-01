@@ -6,7 +6,9 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
   ClockUserIcon,
+  XIcon,
 } from "@phosphor-icons/react";
+import DataEmpty from "@/components/reusable/DataEmpty";
 
 type EcommerceMetricsProps = {
   patientsCount: number;
@@ -14,6 +16,7 @@ type EcommerceMetricsProps = {
   patientsChangePct?: number | null;
   consultationMinutesChangePct?: number | null;
   loading?: boolean;
+  error?: boolean;
 };
 
 const formatPercent = (value?: number | null) => {
@@ -28,7 +31,15 @@ export const EcommerceMetrics = ({
   patientsChangePct,
   consultationMinutesChangePct,
   loading = false,
+  error = false,
 }: EcommerceMetricsProps) => {
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <DataEmpty ItemIcon={XIcon} value="Failed to load" subValue="Metrics" />
+      </div>
+    );
+  }
   const hasPatientTrend =
     typeof patientsChangePct === "number" && Number.isFinite(patientsChangePct);
   const hasConsultationTrend =

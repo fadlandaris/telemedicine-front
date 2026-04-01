@@ -8,14 +8,23 @@ import {
   TableRow,
 } from "../ui/table";
 import Badge from "../ui/badge/Badge";
-import { CardsIcon, FadersHorizontalIcon, SealCheckIcon } from "@phosphor-icons/react";
+import {
+  CardsIcon,
+  CircleNotchIcon,
+  EmptyIcon,
+  FadersHorizontalIcon,
+  SealCheckIcon,
+  XIcon,
+} from "@phosphor-icons/react";
 import Link from "next/link";
 import type { CallItemDto } from "@/services/history/history.dto";
 import trimText from "@/hooks/useTrimText";
+import DataEmpty from "@/components/reusable/DataEmpty";
 
 type RecentConsultationsProps = {
   rows: CallItemDto[];
   loading?: boolean;
+  error?: boolean;
 };
 
 const formatDate = (date?: string | null) => {
@@ -77,6 +86,7 @@ const formatPatientName = (item: CallItemDto) => {
 export default function RecentConsultations({
   rows,
   loading = false,
+  error = false,
 }: RecentConsultationsProps) {
   const safeRows = Array.isArray(rows) ? rows : [];
   return (
@@ -136,64 +146,63 @@ export default function RecentConsultations({
 
           {/* Table Body */}
           <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
-            {loading ? (
-              <TableRow>
-                <TableCell className="py-3 text-gray-500 text-theme-sm" colSpan={4}>
-                  Loading consultations...
-                </TableCell>
-              </TableRow>
-            ) : safeRows.length === 0 ? (
-              <TableRow>
-                <TableCell className="py-3 text-gray-500 text-theme-sm" colSpan={4}>
-                  No consultations yet.
-                </TableCell>
-              </TableRow>
-            ) : (
-              safeRows.map((item) => {
-                const doctorName = item.doctorName ?? "-";
-                const consultationName = formatConsultationName(item);
-                const patientName = formatPatientName(item);
-                return (
-                  <TableRow key={item.id} className="align-top">
-                    <TableCell className="py-4 align-top">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-x-2">
-                          <p
-                            className="font-medium text-gray-800 text-theme-sm dark:text-white/90 truncate"
-                            title={doctorName}
-                          >
-                            {trimText(doctorName, 32)}
-                          </p>
-                          <SealCheckIcon className="text-xs text-success-400" weight="fill"/>
-                        </div>
-                        <span
-                          className="block text-gray-500 text-theme-xs dark:text-gray-400 truncate"
-                          title={consultationName}
+            {safeRows.map((item) => {
+              const doctorName = item.doctorName ?? "-";
+              const consultationName = formatConsultationName(item);
+              const patientName = formatPatientName(item);
+              return (
+                <TableRow key={item.id} className="align-top">
+                  <TableCell className="py-4 align-top">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-x-2">
+                        <p
+                          className="font-medium text-gray-800 text-theme-sm dark:text-white/90 truncate"
+                          title={doctorName}
                         >
-                          {trimText(consultationName, 22)}
-                        </span>
+                          {trimText(doctorName, 32)}
+                        </p>
+                        <SealCheckIcon className="text-xs text-success-400" weight="fill"/>
                       </div>
-                    </TableCell>
-                    <TableCell className="py-4 text-gray-500 text-theme-sm dark:text-gray-400 align-top">
-                      <span className="block truncate" title={patientName}>
-                        {trimText(patientName, 20)}
+                      <span
+                        className="block text-gray-500 text-theme-xs dark:text-gray-400 truncate"
+                        title={consultationName}
+                      >
+                        {trimText(consultationName, 22)}
                       </span>
-                    </TableCell>
-                    <TableCell className="py-4 text-gray-500 text-theme-sm dark:text-gray-400 align-top whitespace-nowrap">
-                      {formatDate(item.startedAt ?? item.consultationStartedAt ?? item.createdAt)}
-                    </TableCell>
-                    <TableCell className="py-4 text-gray-500 text-theme-sm dark:text-gray-400 align-top whitespace-nowrap">
-                      <Badge size="sm" color={getStatusColor(item.status)}>
-                        {getStatusLabel(item.status)}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-4 text-gray-500 text-theme-sm dark:text-gray-400 align-top">
+                    <span className="block truncate" title={patientName}>
+                      {trimText(patientName, 20)}
+                    </span>
+                  </TableCell>
+                  <TableCell className="py-4 text-gray-500 text-theme-sm dark:text-gray-400 align-top whitespace-nowrap">
+                    {formatDate(item.startedAt ?? item.consultationStartedAt ?? item.createdAt)}
+                  </TableCell>
+                  <TableCell className="py-4 text-gray-500 text-theme-sm dark:text-gray-400 align-top whitespace-nowrap">
+                    <Badge size="sm" color={getStatusColor(item.status)}>
+                      {getStatusLabel(item.status)}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
+      {loading ? (
+        <div className="">
+          <DataEmpty ItemIcon={CircleNotchIcon} value="Loading" subValue="Consultations" />
+        </div>
+      ) : error ? (
+        <div className="">
+          <DataEmpty ItemIcon={XIcon} value="Failed to load" subValue="Consultations" />
+        </div>
+      ) : safeRows.length === 0 ? (
+        <div className="">
+          <DataEmpty ItemIcon={EmptyIcon} value="Data Empty" subValue="Starts consultations" />
+        </div>
+      ) : null}
     </div>
   );
 }

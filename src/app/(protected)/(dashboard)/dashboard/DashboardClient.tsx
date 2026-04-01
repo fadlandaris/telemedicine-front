@@ -58,6 +58,7 @@ export default function DashboardClient() {
   const [accessToken, setAccessToken] = useState(() => authStore.getState().accessToken);
   const [calls, setCalls] = useState<CallItemDto[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const unsubscribe = authStore.subscribe((state) => {
@@ -73,15 +74,23 @@ export default function DashboardClient() {
     async function loadCalls() {
       if (!accessToken) {
         if (active) setCalls([]);
+        if (active) setError(false);
         return;
       }
 
       setLoading(true);
+      setError(false);
       try {
         const data = await historyApi.getAllCalls(accessToken, { sort: "newest" });
-        if (active) setCalls(Array.isArray(data) ? data : []);
+        if (active) {
+          setCalls(Array.isArray(data) ? data : []);
+          setError(false);
+        }
       } catch (error) {
-        if (active) setCalls([]);
+        if (active) {
+          setCalls([]);
+          setError(true);
+        }
       } finally {
         if (active) setLoading(false);
       }
@@ -232,10 +241,12 @@ export default function DashboardClient() {
           patientsChangePct={metrics.patientsChangePct}
           consultationMinutesChangePct={metrics.minutesChangePct}
           loading={loading}
+          error={error}
         />
         <MonthlySalesChart
           monthlyCounts={metrics.monthlyCounts}
           loading={loading}
+          error={error}
         />
       </div>
 
@@ -245,15 +256,12 @@ export default function DashboardClient() {
           target={MONTHLY_TARGET}
           todayCalls={metrics.todayCalls}
           loading={loading}
+          error={error}
         />
       </div>
 
       <div className="col-span-12">
-        <StatisticsChart
-          monthlyCounts={metrics.monthlyCounts}
-          monthlyHours={metrics.monthlyHours}
-          loading={loading}
-        />
+        <StatisticsChart accessToken={accessToken} />
       </div>
 
       <div className="col-span-12 xl:col-span-5">
@@ -262,11 +270,12 @@ export default function DashboardClient() {
           markers={metrics.cityMarkers}
           total={metrics.cityTotal}
           loading={loading}
+          error={error}
         />
       </div>
 
       <div className="col-span-12 xl:col-span-7">
-        <RecentOrders rows={metrics.recentCalls} loading={loading} />
+        <RecentOrders rows={metrics.recentCalls} loading={loading} error={error} />
       </div>
     </div>
   );
