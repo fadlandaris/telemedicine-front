@@ -4,6 +4,8 @@ import type {
   GetCallsParams,
   GetCallsResponse,
   GetCallDetailResponse,
+  GetCallStatsParams,
+  CallStatsResponse,
 } from "./history.dto";
 
 export const historyApi = {
@@ -53,6 +55,20 @@ export const historyApi = {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+    });
+
+    return res.data;
+  },
+
+  async getCallStats(
+    accessToken: string,
+    params: GetCallStatsParams,
+  ): Promise<CallStatsResponse> {
+    const res = await http.get<CallStatsResponse>("/call/statistics", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      params,
     });
 
     return res.data;

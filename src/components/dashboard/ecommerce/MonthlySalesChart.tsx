@@ -1,7 +1,8 @@
 "use client";
 import { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";
-import { DotsThreeOutlineVerticalIcon } from "@phosphor-icons/react";
+import { DotsThreeOutlineVerticalIcon, XIcon } from "@phosphor-icons/react";
+import DataEmpty from "@/components/reusable/DataEmpty";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
@@ -9,6 +10,7 @@ import { Dropdown } from "../ui/dropdown/Dropdown";
 type MonthlyConsultationChartProps = {
   monthlyCounts: number[];
   loading?: boolean;
+  error?: boolean;
 };
 
 // Dynamically import the ReactApexChart component
@@ -19,7 +21,22 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
 export default function MonthlyConsultationChart({
   monthlyCounts,
   loading = false,
+  error = false,
 }: MonthlyConsultationChartProps) {
+  if (error) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+            Monthly Consultations
+          </h3>
+        </div>
+        <div className="p-6">
+          <DataEmpty ItemIcon={XIcon} value="Failed to load" subValue="Consultations" />
+        </div>
+      </div>
+    );
+  }
   const options: ApexOptions = {
     colors: ["#465fff"],
     chart: {
@@ -139,12 +156,14 @@ export default function MonthlyConsultationChart({
             className="w-40 p-2"
           >
             <DropdownItem
+              variant={true}
               onItemClick={closeDropdown}
               className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               View More
             </DropdownItem>
             <DropdownItem
+              variant={false}
               onItemClick={closeDropdown}
               className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >

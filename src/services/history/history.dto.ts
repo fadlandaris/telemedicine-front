@@ -3,6 +3,13 @@ export type GetCallsParams = {
   limit?: number;
   search?: string;
   sort?: "newest" | "oldest";
+  status?: "STARTED" | "CONNECTED" | "RECORDING_READY" | "COMPLETED" | "FAILED";
+};
+
+export type GetCallStatsParams = {
+  startDate: string;
+  endDate: string;
+  tzOffset?: number;
 };
 
 export type CallItemDto = {
@@ -94,4 +101,12 @@ export type GetCallDetailResponse = {
     createdAt: string;
     updatedAt: string;
   } | null;
+};
+
+export type CallStatsResponse = {
+  startDate: string;
+  endDate: string;
+  categories: string[];
+  dailyCounts: number[];
+  dailyHours: number[];
 };

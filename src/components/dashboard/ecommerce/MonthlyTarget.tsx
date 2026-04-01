@@ -12,9 +12,11 @@ import {
   DotsThreeOutlineVerticalIcon,
   MinusIcon,
   SealCheckIcon,
+  XIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
+import DataEmpty from "@/components/reusable/DataEmpty";
 
 
 type MonthlyTargetProps = {
@@ -22,6 +24,7 @@ type MonthlyTargetProps = {
   target: number;
   todayCalls: number;
   loading?: boolean;
+  error?: boolean;
 };
 
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
@@ -33,7 +36,23 @@ export default function MonthlyTarget({
   target,
   todayCalls,
   loading = false,
+  error = false,
 }: MonthlyTargetProps) {
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+          Monthly Target
+        </h3>
+        <p className="mt-1 font-normal text-gray-500 text-theme-sm dark:text-gray-400">
+          Target you've set for each month
+        </p>
+        <div className="mt-4">
+          <DataEmpty ItemIcon={XIcon} value="Failed to load" subValue="Target" />
+        </div>
+      </div>
+    );
+  }
   const safeTarget = Math.max(0, target);
   const progressRaw = safeTarget > 0 ? (currentMonthCalls / safeTarget) * 100 : 0;
   const progressPercent = Math.min(100, Number(progressRaw.toFixed(2)));
@@ -150,6 +169,7 @@ export default function MonthlyTarget({
             >
               <DropdownItem
                 tag="a"
+                variant={true}
                 onItemClick={closeDropdown}
                 className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
               >
@@ -157,6 +177,7 @@ export default function MonthlyTarget({
               </DropdownItem>
               <DropdownItem
                 tag="a"
+                variant={false}
                 onItemClick={closeDropdown}
                 className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
               >
